@@ -1,7 +1,16 @@
 import * as fs from 'fs';
 import { sortBy, filter } from 'lodash';
 
-const [source, outputTo]: string[] = getArgs();
+let [source, outputTo]: string[] = getArgs();
+
+if (!source) {
+	throw new Error('You must enter a source file');
+}
+
+if (!outputTo) {
+	outputTo = 'sorted.txt';
+}
+
 fs.readFile(source, (readError, data) => {
 	if (readError) {
 		throw readError;
