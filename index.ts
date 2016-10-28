@@ -1,17 +1,20 @@
 import * as fs from 'fs';
 import { sortBy, filter } from 'lodash';
 
-fs.readFile('data.txt', (readError, data) => {
+const [source, outputTo]: string[] = getArgs();
+fs.readFile(source, (readError, data) => {
 	if (readError) {
 		throw readError;
 	}
 
 	const words = toWords(data.toString());
 	const sorted = alphabetize(words);
-	fs.writeFile('data.sorted.txt', toFileString(sorted), writeError => {
+	fs.writeFile(outputTo, toFileString(sorted), writeError => {
 		if (writeError) {
 			throw writeError;
 		}
+
+		console.log(`${source} -> alphabetize -> ${outputTo}`);
 	});
 });
 
