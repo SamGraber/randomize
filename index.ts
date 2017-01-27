@@ -1,5 +1,5 @@
 import * as fs from 'fs';
-import { sortBy, filter } from 'lodash';
+import { sortBy, map } from 'lodash';
 
 let [source, outputTo]: string[] = getArgs();
 
@@ -8,7 +8,7 @@ if (!source) {
 }
 
 if (!outputTo) {
-	outputTo = 'sorted.txt';
+	outputTo = 'randomized.txt';
 }
 
 fs.readFile(source, (readError, data) => {
@@ -16,29 +16,33 @@ fs.readFile(source, (readError, data) => {
 		throw readError;
 	}
 
-	const words = toWords(data.toString());
-	const sorted = alphabetize(words);
-	fs.writeFile(outputTo, toFileString(sorted), writeError => {
+	const lines = toLines(data.toString());
+	const randomizedLines = map(lines, line => {
+		return line.replace(/random/g, random(1000, 1000000).toString());
+	});
+	fs.writeFile(outputTo, toFileString(randomizedLines), writeError => {
 		if (writeError) {
 			throw writeError;
 		}
 
-		console.log(`${source} -> alphabetize -> ${outputTo}`);
+		console.log(`${source} -> randomize -> ${outputTo}`);
 	});
 });
 
 const newline = '\r\n';
 
-function toWords(text: string): string[] {
+function toLines(text: string): string[] {
 	return text.split(newline);
 }
 
-function alphabetize(words: string[]): string[] {
-	return sortBy(filter(words, word => !!word));
+function random(from: number, to: number): number {
+	const seed = Math.random();
+	const largestWholeNumber = Math.floor(seed * (to - from + 1));
+	return largestWholeNumber + from;
 }
 
-function toFileString(words: string[]): string {
-	return [...words, ''].join(newline);
+function toFileString(lines: string[]): string {
+	return [...lines, ''].join(newline);
 }
 
 function getArgs(): string[] {
